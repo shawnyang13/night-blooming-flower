@@ -1,0 +1,21 @@
+
+
+
+操作使用视频链接：https://v.youku.com/v_show/id_XNTg1NTM2NTkzMg==.html
+密码：6h6f3g
+
+
+开发板引脚定义：
+https://www.yiboard.com/thread-1845-1-1.html#google_vignette
+
+
+Arduino IDE搭建ESP32或ESP8266开发环境（附离线安装包）：
+https://blog.csdn.net/qq_34426854/article/details/145853077?spm=1001.2014.3001.5501
+
+
+ESP32+网页控制板载LED：
+https://blog.csdn.net/qq_34426854/article/details/146170957?spm=1001.2014.3001.5501
+
+
+ESP32使用蓝牙控制LED灯：
+https://blog.csdn.net/qq_34426854/article/details/146248991?spm=1001.2014.3001.5501

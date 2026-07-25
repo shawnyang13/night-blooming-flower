@@ -1,0 +1,12 @@
+
+
+
+
+
+  CH340驱动下载：https://pan.baidu.com/s/1oEDHyVhD0MpAVpJyFlvM3w 
+  提取码：ix2i  
+
+
+
+安装不上可以试试从官网下载
+  CH340官网版本：https://www.wch.cn/downloads/CH341SER_EXE.html
