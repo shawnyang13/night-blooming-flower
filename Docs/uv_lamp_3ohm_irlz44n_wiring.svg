@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1080" viewBox="0 0 1500 1080">
+  <defs>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #172033; }
+      .title { font-size: 30px; font-weight: 700; }
+      .section { font-size: 22px; font-weight: 700; }
+      .label { font-size: 17px; font-weight: 700; }
+      .small { font-size: 15px; }
+      .tiny { font-size: 13px; }
+      .wire { fill: none; stroke: #1f2937; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+      .power { stroke: #dc2626; }
+      .ground { stroke: #111827; }
+      .signal { stroke: #2563eb; }
+      .part { fill: #ffffff; stroke: #1f2937; stroke-width: 3; }
+      .board { fill: #182033; stroke: #0f172a; stroke-width: 4; }
+      .pin { fill: #ffffff; stroke: #64748b; stroke-width: 2; }
+      .powerlabel { fill: #fff1f2; stroke: #dc2626; stroke-width: 2; }
+      .groundlabel { fill: #f8fafc; stroke: #111827; stroke-width: 2; }
+      .signallabel { fill: #eef2ff; stroke: #2563eb; stroke-width: 2; }
+      .note { fill: #fff8db; stroke: #d6a500; stroke-width: 2; }
+      .danger { fill: #fff1f2; stroke: #e11d48; stroke-width: 2; }
+      .tag { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1500" height="1080" fill="#f7f9fc" />
+  <text x="60" y="56" class="title">ESP32 控制 3W UV 灯接线图：3Ω 电阻 + IRLZ44N 临时方案</text>
+
+  <line x1="64" y1="92" x2="122" y2="92" class="wire power" />
+  <text x="138" y="98" class="small">红线：VIN / 5V</text>
+  <line x1="330" y1="92" x2="388" y2="92" class="wire ground" />
+  <text x="404" y="98" class="small">黑线：GND</text>
+  <line x1="570" y1="92" x2="628" y2="92" class="wire signal" />
+  <text x="644" y="98" class="small">蓝线：GPIO23 控制 IRLZ44N 栅极</text>
+
+  <!-- ESP32 board -->
+  <rect x="70" y="170" width="310" height="520" rx="18" class="board" />
+  <rect x="166" y="196" width="120" height="72" rx="8" fill="#313b55" stroke="#64748b" stroke-width="2" />
+  <text x="174" y="238" class="small" fill="#ffffff">ESP-WROOM-32</text>
+  <rect x="174" y="618" width="104" height="42" rx="9" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2" />
+  <text x="199" y="645" class="small">USB</text>
+  <text x="132" y="720" class="section">ESP32 Dev Board</text>
+
+  <rect x="108" y="235" width="210" height="52" rx="8" class="signallabel" />
+  <text x="130" y="257" class="label">GPIO23 / MOSI</text>
+  <text x="130" y="280" class="small">PWM 输出，接 MOS 管 G</text>
+  <circle cx="380" cy="260" r="11" class="pin" />
+
+  <rect x="108" y="430" width="180" height="44" rx="8" class="powerlabel" />
+  <text x="130" y="458" class="label" fill="#dc2626">VIN / 5V 引脚</text>
+  <circle cx="380" cy="452" r="11" class="pin" />
+
+  <rect x="108" y="565" width="180" height="44" rx="8" class="groundlabel" />
+  <text x="130" y="593" class="label">GND 引脚</text>
+  <circle cx="380" cy="587" r="11" class="pin" />
+
+  <!-- Resistor in main path -->
+  <path d="M380 452 H505" class="wire power" />
+  <path d="M505 452 h24 l16 -26 l32 52 l32 -52 l32 52 l32 -52 l16 26 h66" class="wire power" />
+  <rect x="512" y="506" width="230" height="62" rx="10" class="part" />
+  <text x="546" y="532" class="label">3Ω / 2W 电阻</text>
+  <text x="538" y="557" class="small">串在 UV 灯正极前面</text>
+
+  <!-- UV LED -->
+  <rect x="850" y="374" width="220" height="156" rx="14" class="part" />
+  <text x="914" y="409" class="label">3W UV LED</text>
+  <text x="890" y="443" class="small">左侧：正极 +</text>
+  <text x="890" y="469" class="small">右侧：负极 -</text>
+  <text x="884" y="504" class="small">必须贴散热片</text>
+  <circle cx="850" cy="452" r="10" class="pin" />
+  <rect x="812" y="410" width="44" height="34" rx="8" class="tag" />
+  <text x="827" y="433" class="label" fill="#dc2626">+</text>
+  <circle cx="1070" cy="452" r="10" class="pin" />
+  <rect x="1086" y="412" width="44" height="34" rx="8" class="tag" />
+  <text x="1102" y="435" class="label">-</text>
+  <path d="M755 452 H850" class="wire power" />
+
+  <!-- IRLZ44N drawn as a rotated low-side switch block -->
+  <rect x="1190" y="570" width="220" height="210" rx="14" class="part" />
+  <text x="1226" y="610" class="section">IRLZ44N</text>
+  <text x="1218" y="642" class="small">这里旋转画法，方便接线</text>
+  <rect x="1222" y="664" width="156" height="58" rx="9" class="groundlabel" />
+  <text x="1244" y="688" class="label">实物脚朝下：</text>
+  <text x="1238" y="712" class="label">左 G / 中 D / 右 S</text>
+
+  <circle cx="1300" cy="570" r="10" class="pin" />
+  <rect x="1322" y="552" width="66" height="34" rx="8" class="tag" />
+  <text x="1338" y="575" class="label">D</text>
+
+  <circle cx="1190" cy="675" r="10" class="pin" />
+  <rect x="1116" y="620" width="62" height="36" rx="8" class="tag" />
+  <text x="1138" y="644" class="label" fill="#2563eb">G</text>
+
+  <circle cx="1300" cy="780" r="10" class="pin" />
+  <rect x="1322" y="762" width="66" height="34" rx="8" class="tag" />
+  <text x="1338" y="785" class="label">S</text>
+
+  <!-- Load and ground path -->
+  <path d="M1070 452 H1300 V570" class="wire" />
+  <path d="M1300 780 V830 H470 V587 H380" class="wire ground" />
+
+  <!-- Gate path and pulldown -->
+  <path d="M380 260 H505" class="wire signal" />
+  <rect x="505" y="234" width="126" height="52" rx="10" class="part" />
+  <text x="537" y="267" class="label">100Ω</text>
+  <path d="M631 260 H1040 V675 H1190" class="wire signal" />
+  <rect x="660" y="185" width="338" height="38" rx="8" class="signallabel" />
+  <text x="682" y="210" class="small">GPIO23 通过 100Ω~220Ω 接 IRLZ44N 的 G</text>
+
+  <path d="M1040 675 H1080 V725" class="wire signal" />
+  <rect x="1032" y="725" width="96" height="52" rx="9" class="part" />
+  <text x="1052" y="758" class="label">100kΩ</text>
+  <path d="M1080 777 V830" class="wire ground" />
+  <rect x="70" y="850" width="650" height="92" rx="10" class="danger" />
+  <text x="94" y="884" class="label">注意</text>
+  <text x="94" y="911" class="small">这是临时电阻限流方案，只适合 VIN 约 5V，不要接 12V。</text>
+  <text x="94" y="933" class="small">3Ω/2W 电阻和 UV 灯都会发热。UV 灯不要直视。</text>
+
+  <rect x="70" y="965" width="1230" height="88" rx="10" class="note" />
+  <text x="94" y="995" class="small">接线顺序：VIN -&gt; 3Ω 电阻 -&gt; UV灯+；UV灯- -&gt; IRLZ44N D；IRLZ44N S -&gt; GND。所有 GND 必须共地。</text>
+  <text x="94" y="1021" class="small">GPIO23 -&gt; 100Ω -&gt; IRLZ44N G；IRLZ44N G -&gt; 100kΩ -&gt; GND。100kΩ 是下拉，防止上电误亮。</text>
+  <text x="94" y="1045" class="small">IRLZ44N 金属背板也连接 D，中脚/背板不要碰到 GND。</text>
+</svg>

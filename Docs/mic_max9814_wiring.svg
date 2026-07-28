@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="900" viewBox="0 0 1500 900">
+  <defs>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #172033; }
+      .title { font-size: 30px; font-weight: 700; }
+      .section { font-size: 22px; font-weight: 700; }
+      .label { font-size: 17px; font-weight: 700; }
+      .small { font-size: 15px; }
+      .tiny { font-size: 13px; }
+      .wire { fill: none; stroke: #1f2937; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+      .power { stroke: #dc2626; }
+      .ground { stroke: #111827; }
+      .signal { stroke: #2563eb; }
+      .part { fill: #ffffff; stroke: #1f2937; stroke-width: 3; }
+      .board { fill: #182033; stroke: #0f172a; stroke-width: 4; }
+      .pin { fill: #ffffff; stroke: #64748b; stroke-width: 2; }
+      .powerlabel { fill: #fff1f2; stroke: #dc2626; stroke-width: 2; }
+      .groundlabel { fill: #f8fafc; stroke: #111827; stroke-width: 2; }
+      .signallabel { fill: #eef2ff; stroke: #2563eb; stroke-width: 2; }
+      .driverlabel { fill: #f5f3ff; stroke: #7c3aed; stroke-width: 2; }
+      .note { fill: #fff8db; stroke: #d6a500; stroke-width: 2; }
+      .danger { fill: #fff1f2; stroke: #e11d48; stroke-width: 2; }
+      .tag { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1500" height="900" fill="#f7f9fc" />
+  <text x="60" y="56" class="title">ESP32 接 MAX9814 麦克风模块（声控呼吸灯输入）</text>
+
+  <line x1="64" y1="92" x2="122" y2="92" class="wire power" />
+  <text x="138" y="98" class="small">红线：3V3</text>
+  <line x1="300" y1="92" x2="358" y2="92" class="wire ground" />
+  <text x="374" y="98" class="small">黑线：GND</text>
+  <line x1="520" y1="92" x2="578" y2="92" class="wire signal" />
+  <text x="594" y="98" class="small">蓝线：OUT -&gt; GPIO34 (ADC1)</text>
+
+  <!-- ESP32 board -->
+  <rect x="70" y="150" width="310" height="520" rx="18" class="board" />
+  <rect x="166" y="176" width="120" height="72" rx="8" fill="#313b55" stroke="#64748b" stroke-width="2" />
+  <text x="174" y="218" class="small" fill="#ffffff">ESP-WROOM-32</text>
+  <rect x="174" y="598" width="104" height="42" rx="9" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2" />
+  <text x="199" y="625" class="small">USB</text>
+  <text x="132" y="700" class="section">ESP32 Dev Board</text>
+
+  <rect x="108" y="295" width="200" height="52" rx="8" class="signallabel" />
+  <text x="122" y="317" class="label">GPIO34 / ADC1_CH6</text>
+  <text x="122" y="340" class="small">仅输入引脚，接 OUT</text>
+  <circle cx="380" cy="321" r="11" class="pin" />
+
+  <rect x="108" y="400" width="180" height="44" rx="8" class="powerlabel" />
+  <text x="130" y="428" class="label" fill="#dc2626">3V3 引脚</text>
+  <circle cx="380" cy="422" r="11" class="pin" />
+
+  <rect x="108" y="500" width="180" height="44" rx="8" class="groundlabel" />
+  <text x="130" y="528" class="label">GND 引脚</text>
+  <circle cx="380" cy="522" r="11" class="pin" />
+
+  <!-- MAX9814 module -->
+  <rect x="700" y="230" width="340" height="380" rx="18" class="part" />
+  <text x="770" y="270" class="section">MAX9814 麦克风模块</text>
+  <text x="726" y="298" class="small">自带 AGC，自动适应音量大小</text>
+
+  <circle cx="700" cy="340" r="10" class="pin" />
+  <rect x="716" y="320" width="96" height="40" rx="9" class="tag" />
+  <text x="732" y="346" class="small" fill="#dc2626">VCC</text>
+
+  <circle cx="700" cy="410" r="10" class="pin" />
+  <rect x="716" y="390" width="96" height="40" rx="9" class="tag" />
+  <text x="732" y="416" class="small">GND</text>
+
+  <circle cx="700" cy="480" r="10" class="pin" />
+  <rect x="716" y="460" width="96" height="40" rx="9" class="tag" />
+  <text x="735" y="486" class="small" fill="#2563eb">OUT</text>
+
+  <circle cx="700" cy="550" r="10" class="pin" />
+  <rect x="716" y="530" width="96" height="40" rx="9" class="tag" />
+  <text x="732" y="556" class="small">GAIN</text>
+
+  <circle cx="1040" cy="550" r="10" class="pin" />
+  <rect x="1054" y="530" width="86" height="40" rx="9" class="tag" />
+  <text x="1068" y="556" class="small">A/R</text>
+
+  <!-- Wires: each routed on its own vertical channel so none share a path -->
+  <path d="M380 422 H440 V340 H700" class="wire power" />
+  <path d="M380 522 H470 V410 H700" class="wire ground" />
+  <path d="M380 321 H500 V480 H700" class="wire signal" />
+
+  <rect x="700" y="655" width="500" height="40" rx="8" class="note" />
+  <text x="716" y="681" class="small">GAIN 悬空 = 60dB；如果音乐大声时削波，把 GAIN 接到 3V3 换成 40dB</text>
+
+  <rect x="700" y="705" width="500" height="40" rx="8" class="note" />
+  <text x="716" y="731" class="small">A/R 悬空即可，使用默认起落时间</text>
+
+  <rect x="70" y="750" width="1280" height="66" rx="10" class="danger" />
+  <text x="94" y="782" class="label">注意</text>
+  <text x="94" y="804" class="small">麦克风的 OUT 只能接 ADC1 引脚（GPIO32-39），不要用 ADC2 引脚 -- Wi-Fi 打开时 ADC2 会失效。</text>
+
+  <rect x="70" y="832" width="1280" height="52" rx="10" class="note" />
+  <text x="94" y="864" class="small">UV 灯部分接线（GPIO23 -&gt; CN5711 -&gt; UV LED）与 uv_lamp_cn5711_wiring.svg 完全一致，两张图合起来看即为完整电路。</text>
+</svg>
