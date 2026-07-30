@@ -28,7 +28,7 @@ const int MIC_PIN = 34;
 const int PWM_FREQUENCY_HZ = 1000;
 const int PWM_RESOLUTION_BITS = 8;
 const int PWM_MAX_DUTY = (1 << PWM_RESOLUTION_BITS) - 1;
-const int MAX_BRIGHTNESS_PERCENT = 55;
+const int MAX_BRIGHTNESS_PERCENT = 80;
 const byte BREATH_FLOOR_PERCENT = 3;
 
 const unsigned long SAMPLE_WINDOW_MS = 30;

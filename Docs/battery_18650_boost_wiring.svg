@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1560" height="950" viewBox="0 0 1560 950">
+  <defs>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #172033; }
+      .title { font-size: 30px; font-weight: 700; }
+      .section { font-size: 20px; font-weight: 700; }
+      .label { font-size: 16px; font-weight: 700; }
+      .small { font-size: 15px; }
+      .tiny { font-size: 13px; }
+      .wire { fill: none; stroke: #1f2937; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+      .power { stroke: #dc2626; }
+      .ground { stroke: #111827; }
+      .part { fill: #ffffff; stroke: #1f2937; stroke-width: 3; }
+      .pin { fill: #ffffff; stroke: #64748b; stroke-width: 2; }
+      .junction-power { fill: #dc2626; }
+      .junction-ground { fill: #111827; }
+      .note { fill: #fff8db; stroke: #d6a500; stroke-width: 2; }
+      .danger { fill: #fff1f2; stroke: #e11d48; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1560" height="950" fill="#f7f9fc" />
+  <text x="60" y="56" class="title">ESP32 加装 18650 电池供电（充电 + 总开关）</text>
+
+  <line x1="64" y1="92" x2="122" y2="92" class="wire power" />
+  <text x="138" y="98" class="small">红线：电池正极 / 5V</text>
+  <line x1="330" y1="92" x2="388" y2="92" class="wire ground" />
+  <text x="404" y="98" class="small">黑线：GND</text>
+
+  <!-- 18650 battery -->
+  <rect x="60" y="260" width="200" height="160" rx="16" class="part" />
+  <text x="86" y="300" class="section">18650 电池</text>
+  <text x="80" y="326" class="small">务必用带保护板</text>
+  <text x="80" y="348" class="small">的电芯，不要裸电芯</text>
+  <circle cx="260" cy="320" r="10" class="pin" />
+  <text x="200" y="312" class="label" fill="#dc2626">+</text>
+  <circle cx="260" cy="380" r="10" class="pin" />
+  <text x="200" y="404" class="label">-</text>
+
+  <!-- TP4056 -->
+  <rect x="380" y="220" width="260" height="240" rx="16" class="part" />
+  <text x="404" y="256" class="section">TP4056 充电/保护板</text>
+  <text x="404" y="282" class="small">买带保护板的版本</text>
+  <text x="404" y="304" class="small">(过充/过放/过流保护)</text>
+  <rect x="470" y="330" width="90" height="60" rx="8" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2" />
+  <text x="484" y="366" class="tiny">Micro-USB</text>
+  <text x="470" y="410" class="tiny">外部充电器插这里，</text>
+  <text x="470" y="428" class="tiny">和ESP32供电互不影响</text>
+
+  <circle cx="380" cy="320" r="10" class="pin" />
+  <text x="386" y="308" class="tiny" fill="#dc2626">B+</text>
+  <circle cx="380" cy="380" r="10" class="pin" />
+  <text x="386" y="402" class="tiny">B-</text>
+
+  <circle cx="640" cy="320" r="10" class="pin" />
+  <text x="580" y="308" class="tiny" fill="#dc2626">OUT+</text>
+  <circle cx="640" cy="380" r="10" class="pin" />
+  <text x="578" y="402" class="tiny">OUT-</text>
+
+  <!-- Boost module -->
+  <rect x="760" y="220" width="220" height="240" rx="16" class="part" />
+  <text x="784" y="256" class="section">5V 升压模块</text>
+  <text x="784" y="282" class="small">(MT3608 类, 1A)</text>
+  <text x="784" y="304" class="small">3.7V -&gt; 5V</text>
+
+  <circle cx="760" cy="320" r="10" class="pin" />
+  <text x="766" y="308" class="tiny" fill="#dc2626">IN+</text>
+  <circle cx="760" cy="380" r="10" class="pin" />
+  <text x="766" y="402" class="tiny">IN-</text>
+
+  <circle cx="980" cy="320" r="10" class="pin" />
+  <text x="910" y="308" class="tiny" fill="#dc2626">OUT+ 5V</text>
+  <circle cx="980" cy="380" r="10" class="pin" />
+  <text x="922" y="402" class="tiny">OUT- GND</text>
+
+  <!-- Switch -->
+  <rect x="1060" y="300" width="90" height="40" rx="8" class="part" />
+  <text x="1074" y="326" class="small">开关</text>
+
+  <!-- ESP32 pins -->
+  <rect x="1220" y="220" width="280" height="240" rx="16" class="part" />
+  <text x="1244" y="256" class="section">ESP32 开发板</text>
+  <text x="1244" y="282" class="small">跟USB供电接的是</text>
+  <text x="1244" y="304" class="small">同一个 5V/VIN 引脚</text>
+
+  <circle cx="1220" cy="320" r="10" class="pin" />
+  <text x="1244" y="326" class="label" fill="#dc2626">5V / VIN</text>
+  <circle cx="1220" cy="380" r="10" class="pin" />
+  <text x="1244" y="386" class="label">GND</text>
+
+  <!-- Wires: battery -> TP4056 -->
+  <path d="M260 320 H380" class="wire power" />
+  <path d="M260 380 H380" class="wire ground" />
+
+  <!-- TP4056 -> Boost -->
+  <path d="M640 320 H760" class="wire power" />
+  <path d="M640 380 H760" class="wire ground" />
+
+  <!-- Boost -> Switch -> ESP32 -->
+  <path d="M980 320 H1060" class="wire power" />
+  <path d="M1150 320 H1220" class="wire power" />
+  <path d="M980 380 H1220" class="wire ground" />
+
+  <!-- Junction dots where the CN5711 branch taps off -->
+  <circle cx="1150" cy="320" r="7" class="junction-power" />
+  <circle cx="1220" cy="380" r="7" class="junction-ground" />
+
+  <!-- Branch down to CN5711 driver (parallel supply) -->
+  <path d="M1150 320 V620 H960" class="wire power" />
+  <path d="M1220 380 V680 H960" class="wire ground" />
+  <circle cx="960" cy="620" r="8" class="pin" />
+  <circle cx="960" cy="680" r="8" class="pin" />
+
+  <rect x="700" y="592" width="240" height="56" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2" />
+  <text x="716" y="614" class="small">并联到 CN5711</text>
+  <text x="716" y="636" class="small">VI (+) 输入</text>
+
+  <rect x="700" y="656" width="240" height="56" rx="10" fill="#f8fafc" stroke="#111827" stroke-width="2" />
+  <text x="716" y="678" class="small">并联到 CN5711</text>
+  <text x="716" y="700" class="small">G (-) 输入</text>
+
+  <rect x="70" y="592" width="580" height="120" rx="10" class="note" />
+  <text x="94" y="622" class="label">说明</text>
+  <text x="94" y="648" class="small">开关放在升压模块之后、ESP32和CN5711之前，</text>
+  <text x="94" y="670" class="small">关开关时整机（灯+ESP32）一起断电，</text>
+  <text x="94" y="692" class="small">充电时不用管开关状态，TP4056独立充电。</text>
+
+  <rect x="70" y="740" width="1420" height="80" rx="10" class="danger" />
+  <text x="94" y="772" class="label">注意</text>
+  <text x="94" y="798" class="small">锂电池必须用带保护板/保护电芯的型号；TP4056 也要买带保护板版本。禁止反接、短路，电池远离UV灯散热片（怕热）。</text>
+
+  <rect x="70" y="836" width="1420" height="80" rx="10" class="note" />
+  <text x="94" y="868" class="small">CN5711 那侧的 VI/G 接线方式与 Docs/uv_lamp_cn5711_wiring.svg 完全一致，这里只是把供电来源从USB换成电池升压后的5V，两张图合起来看即为完整电路。</text>
+</svg>

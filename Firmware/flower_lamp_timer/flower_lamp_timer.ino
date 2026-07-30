@@ -12,7 +12,7 @@ const int LAMP_PIN = 23;
 const int PWM_FREQUENCY_HZ = 1000;
 const int PWM_RESOLUTION_BITS = 8;
 const int PWM_MAX_DUTY = (1 << PWM_RESOLUTION_BITS) - 1;
-const int MAX_BRIGHTNESS_PERCENT = 55;
+const int MAX_BRIGHTNESS_PERCENT = 80;
 
 const unsigned long PLAY_DURATION_MS = 60UL * 1000UL;
 const unsigned long REST_DURATION_MS = 60UL * 1000UL;
