@@ -61,7 +61,7 @@ bash burst/flash.sh
 默认烧录：
 
 ```text
-Firmware/flower_lamp_timer
+Firmware/flower_lamp_mic
 ```
 
 默认串口：
@@ -96,10 +96,10 @@ bash burst/flash.sh --sketch Firmware/flower_lamp_timer --port /dev/ttyUSB0
 
 ```text
 GPIO23 输出 PWM
-每 1 分钟亮一次
-亮 20 秒
-灭 40 秒
-亮灯时呼吸效果
+MAX9814 OUT 接 GPIO34 采集声音
+开机先校准 2 秒环境底噪
+声音越大，UV 灯越亮
+声音变小时，亮度缓慢回落到呼吸底亮
 最大亮度 80%
 ```
 
@@ -117,10 +117,16 @@ wsl.exe -u root -- chmod a+rw /dev/ttyUSB0
 
 ## 6. 声控呼吸灯固件（麦克风版）
 
-`Firmware/flower_lamp_mic` 是另一套固件，灯的亮度跟随麦克风采集到的音乐音量包络呼吸（响的时候亮、静的时候暗），接线见 `Docs/mic_max9814_wiring.svg`。
+`Firmware/flower_lamp_mic` 是默认固件，灯的亮度跟随麦克风采集到的相对声压包络呼吸（响的时候亮、静的时候暗），接线见 `Docs/mic_max9814_wiring.svg` 和 `Docs/uv_lamp_cn5711_wiring.svg`。
 
 烧录这套固件：
 
 ```bash
 bash burst/flash.sh -s Firmware/flower_lamp_mic
+```
+
+如果要烧录原来的定时呼吸灯固件：
+
+```bash
+bash burst/flash.sh -s Firmware/flower_lamp_timer
 ```

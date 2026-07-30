@@ -1,11 +1,10 @@
 /*
   ESP32 microphone-reactive breathing lamp controller.
 
-  The lamp brightness follows the music's volume envelope: louder passages
-  make it brighter, quiet passages let it fade toward the breathing floor.
-  This tracks loudness, not pitch/melody -- reliable pitch/beat tracking
-  needs far more compute than a single-core Arduino loop can spare, while
-  a smoothed volume envelope already reads as "breathing with the music".
+  The lamp brightness follows the microphone's sound-pressure envelope:
+  louder sound raises the UV lamp brightness, quiet sound lets it fade back
+  to the breathing floor. The MAX9814 is not factory SPL-calibrated here, so
+  this maps relative sound pressure from the local room to lamp brightness.
 
   Wiring:
   - Microphone: MAX9814 electret mic module (has onboard AGC, so it adapts
@@ -29,61 +28,73 @@ const int PWM_FREQUENCY_HZ = 1000;
 const int PWM_RESOLUTION_BITS = 8;
 const int PWM_MAX_DUTY = (1 << PWM_RESOLUTION_BITS) - 1;
 const int MAX_BRIGHTNESS_PERCENT = 80;
-const byte BREATH_FLOOR_PERCENT = 3;
+const byte BREATH_FLOOR_PERCENT = 1;
 
-const unsigned long SAMPLE_WINDOW_MS = 30;
-const unsigned long CALIBRATION_MS = 1500;
+const unsigned long SAMPLE_WINDOW_MS = 25;
+const unsigned long CALIBRATION_MS = 2000;
+const unsigned int SAMPLE_DELAY_US = 120;
 
-const float ENVELOPE_ATTACK_ALPHA = 0.6f;
-const float ENVELOPE_RELEASE_ALPHA = 0.05f;
-const float BREATH_SMOOTHING_ALPHA = 0.08f;
-const float CEILING_DECAY_ALPHA = 0.0008f;
-const float NOISE_GATE_MULTIPLIER = 1.3f;
-const float CEILING_HEADROOM_MULTIPLIER = 6.0f;
+const float DC_CENTER_ALPHA = 0.004f;
+const float PRESSURE_ATTACK_ALPHA = 0.65f;
+const float PRESSURE_RELEASE_ALPHA = 0.14f;
+const float BRIGHTNESS_ATTACK_ALPHA = 0.32f;
+const float BRIGHTNESS_RELEASE_ALPHA = 0.09f;
+const float CEILING_DECAY_ALPHA = 0.0012f;
+const float NOISE_GATE_MULTIPLIER = 0.6f;
+const float NOISE_GATE_OFFSET = 3.0f;
+const float CEILING_HEADROOM_MULTIPLIER = 5.5f;
+const float MIN_PRESSURE_RANGE = 24.0f;
 
-float noiseFloor = 0;
-float envelope = 0;
-float loudnessCeiling = 0;
+float micDcCenter = 2048.0f;
+float noiseFloor = 0.0f;
+float pressureEnvelope = 0.0f;
+float pressureCeiling = 0.0f;
 float smoothedBrightnessPercent = BREATH_FLOOR_PERCENT;
-unsigned long windowStartedAt = 0;
-int windowMinReading = 4095;
-int windowMaxReading = 0;
+
+float clampFloat(float value, float low, float high) {
+  return max(low, min(high, value));
+}
 
 void writeBrightnessPercent(float percent) {
-  float limitedPercent = min(percent, (float)MAX_BRIGHTNESS_PERCENT);
+  float limitedPercent = clampFloat(percent, 0.0f, (float)MAX_BRIGHTNESS_PERCENT);
   int duty = (int)(PWM_MAX_DUTY * limitedPercent / 100.0f);
   ledcWrite(LAMP_PIN, duty);
 }
 
-float readPeakToPeakOverWindow(unsigned long windowMs) {
-  int minReading = 4095;
-  int maxReading = 0;
+float readSoundPressureRms(unsigned long windowMs) {
+  float sumSquares = 0.0f;
+  int sampleCount = 0;
   unsigned long windowStart = millis();
 
   while (millis() - windowStart < windowMs) {
     int reading = analogRead(MIC_PIN);
-    minReading = min(minReading, reading);
-    maxReading = max(maxReading, reading);
+    micDcCenter += ((float)reading - micDcCenter) * DC_CENTER_ALPHA;
+
+    float acPressure = (float)reading - micDcCenter;
+    sumSquares += acPressure * acPressure;
+    sampleCount++;
+
+    delayMicroseconds(SAMPLE_DELAY_US);
   }
 
-  return (float)(maxReading - minReading);
+  return sampleCount > 0 ? sqrtf(sumSquares / sampleCount) : 0.0f;
 }
 
 float calibrateNoiseFloor() {
-  float total = 0;
+  float total = 0.0f;
   int samples = 0;
   unsigned long calibrationStart = millis();
 
   while (millis() - calibrationStart < CALIBRATION_MS) {
-    total += readPeakToPeakOverWindow(SAMPLE_WINDOW_MS);
+    total += readSoundPressureRms(SAMPLE_WINDOW_MS);
     samples++;
   }
 
-  return samples > 0 ? total / samples : 0;
+  return samples > 0 ? total / samples : 0.0f;
 }
 
 float smoothstep(float x) {
-  float clamped = max(0.0f, min(1.0f, x));
+  float clamped = clampFloat(x, 0.0f, 1.0f);
   return clamped * clamped * (3.0f - 2.0f * clamped);
 }
 
@@ -92,32 +103,35 @@ void setup() {
   ledcAttach(LAMP_PIN, PWM_FREQUENCY_HZ, PWM_RESOLUTION_BITS);
   writeBrightnessPercent(0);
 
+  micDcCenter = analogRead(MIC_PIN);
   noiseFloor = calibrateNoiseFloor();
-  loudnessCeiling = max(noiseFloor * CEILING_HEADROOM_MULTIPLIER, 40.0f);
-  envelope = noiseFloor;
+  pressureEnvelope = noiseFloor;
+  pressureCeiling = max(noiseFloor * CEILING_HEADROOM_MULTIPLIER, noiseFloor + MIN_PRESSURE_RANGE);
 }
 
 void loop() {
-  float peakToPeak = readPeakToPeakOverWindow(SAMPLE_WINDOW_MS);
+  float soundPressure = readSoundPressureRms(SAMPLE_WINDOW_MS);
 
-  float attackOrRelease = peakToPeak > envelope ? ENVELOPE_ATTACK_ALPHA : ENVELOPE_RELEASE_ALPHA;
-  envelope += (peakToPeak - envelope) * attackOrRelease;
+  float pressureAlpha = soundPressure > pressureEnvelope ? PRESSURE_ATTACK_ALPHA : PRESSURE_RELEASE_ALPHA;
+  pressureEnvelope += (soundPressure - pressureEnvelope) * pressureAlpha;
 
-  if (envelope > loudnessCeiling) {
-    loudnessCeiling = envelope;
+  if (pressureEnvelope > pressureCeiling) {
+    pressureCeiling = pressureEnvelope;
   } else {
-    loudnessCeiling -= loudnessCeiling * CEILING_DECAY_ALPHA;
-    loudnessCeiling = max(loudnessCeiling, noiseFloor * CEILING_HEADROOM_MULTIPLIER);
+    float ceilingFloor = max(noiseFloor * CEILING_HEADROOM_MULTIPLIER, noiseFloor + MIN_PRESSURE_RANGE);
+    pressureCeiling += (ceilingFloor - pressureCeiling) * CEILING_DECAY_ALPHA;
   }
 
-  float normalized = 0;
-  if (envelope > noiseFloor * NOISE_GATE_MULTIPLIER) {
-    normalized = (envelope - noiseFloor) / (loudnessCeiling - noiseFloor);
+  float noiseGate = max(noiseFloor * NOISE_GATE_MULTIPLIER, noiseFloor + NOISE_GATE_OFFSET);
+  float normalized = 0.0f;
+  if (pressureEnvelope > noiseGate) {
+    normalized = (pressureEnvelope - noiseGate) / max(MIN_PRESSURE_RANGE, pressureCeiling - noiseGate);
   }
 
   float eased = smoothstep(normalized);
   float targetPercent = BREATH_FLOOR_PERCENT + eased * (MAX_BRIGHTNESS_PERCENT - BREATH_FLOOR_PERCENT);
+  float brightnessAlpha = targetPercent > smoothedBrightnessPercent ? BRIGHTNESS_ATTACK_ALPHA : BRIGHTNESS_RELEASE_ALPHA;
 
-  smoothedBrightnessPercent += (targetPercent - smoothedBrightnessPercent) * BREATH_SMOOTHING_ALPHA;
+  smoothedBrightnessPercent += (targetPercent - smoothedBrightnessPercent) * brightnessAlpha;
   writeBrightnessPercent(smoothedBrightnessPercent);
 }

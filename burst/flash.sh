@@ -6,7 +6,7 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 ARDUINO_CLI="${ARDUINO_CLI:-$SCRIPT_DIR/tools/bin/arduino-cli}"
 PORT="${PORT:-/dev/ttyUSB0}"
 FQBN="${FQBN:-esp32:esp32:esp32}"
-SKETCH_DIR="${SKETCH_DIR:-$ROOT_DIR/Firmware/flower_lamp_timer}"
+SKETCH_DIR="${SKETCH_DIR:-$ROOT_DIR/Firmware/flower_lamp_mic}"
 DO_COMPILE=1
 DO_UPLOAD=1
 
