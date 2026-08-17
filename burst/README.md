@@ -38,9 +38,11 @@ bash burst/prepare.sh --skip-core-install
 
 ```powershell
 usbipd list
-usbipd attach --wsl --busid <ESP32_BUSID>
+usbipd bind --busid <BUSID>
+usbipd attach --wsl --busid <BUSID> 
+usbipd detach --busid <BUSID>
 ```
-
+ESP32通常USB枚举设备名称显示为Serial CH340。第一次挂载，通常需要先运行bind。不用了可以detach。
 然后在 WSL 里检查：
 
 ```bash

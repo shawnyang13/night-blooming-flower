@@ -1,3 +1,5 @@
+#include <Preferences.h>
+
 /*
   ESP32 microphone-reactive breathing lamp controller.
 
@@ -19,16 +21,19 @@
     unusable whenever Wi-Fi is active.
   - Lamp: same as flower_lamp_timer -- GPIO23 through a 100-220 ohm resistor
     into a constant-current LED driver such as the CN5711 module.
+  - Mode button: momentary push button between GPIO27 and GND.
 */
 
 const int LAMP_PIN = 23;
 const int MIC_PIN = 34;
+const int MODE_BUTTON_PIN = 27;
 
 const int PWM_FREQUENCY_HZ = 1000;
 const int PWM_RESOLUTION_BITS = 8;
 const int PWM_MAX_DUTY = (1 << PWM_RESOLUTION_BITS) - 1;
 const int MAX_BRIGHTNESS_PERCENT = 80;
 const byte BREATH_FLOOR_PERCENT = 1;
+const byte STEADY_BRIGHTNESS_PERCENT = 18;
 
 const unsigned long SAMPLE_WINDOW_MS = 25;
 const unsigned long CALIBRATION_MS = 2000;
@@ -45,11 +50,28 @@ const float NOISE_GATE_OFFSET = 3.0f;
 const float CEILING_HEADROOM_MULTIPLIER = 5.5f;
 const float MIN_PRESSURE_RANGE = 24.0f;
 
+const unsigned long BUTTON_DEBOUNCE_MS = 35;
+const unsigned long BREATH_PERIOD_MS = 3200;
+
+enum LampMode {
+  MODE_SOUND_REACTIVE = 0,
+  MODE_SOFT_BREATH = 1,
+  MODE_STEADY_LOW = 2,
+  MODE_OFF = 3,
+};
+
+const byte MODE_COUNT = 4;
+
+Preferences preferences;
+LampMode activeMode = MODE_SOUND_REACTIVE;
 float micDcCenter = 2048.0f;
 float noiseFloor = 0.0f;
 float pressureEnvelope = 0.0f;
 float pressureCeiling = 0.0f;
 float smoothedBrightnessPercent = BREATH_FLOOR_PERCENT;
+int lastButtonReading = HIGH;
+int stableButtonState = HIGH;
+unsigned long lastButtonChangeAt = 0;
 
 float clampFloat(float value, float low, float high) {
   return max(low, min(high, value));
@@ -98,18 +120,55 @@ float smoothstep(float x) {
   return clamped * clamped * (3.0f - 2.0f * clamped);
 }
 
-void setup() {
-  analogSetPinAttenuation(MIC_PIN, ADC_11db);
-  ledcAttach(LAMP_PIN, PWM_FREQUENCY_HZ, PWM_RESOLUTION_BITS);
-  writeBrightnessPercent(0);
-
-  micDcCenter = analogRead(MIC_PIN);
-  noiseFloor = calibrateNoiseFloor();
-  pressureEnvelope = noiseFloor;
-  pressureCeiling = max(noiseFloor * CEILING_HEADROOM_MULTIPLIER, noiseFloor + MIN_PRESSURE_RANGE);
+void saveMode() {
+  preferences.putUChar("mode", (byte)activeMode);
 }
 
-void loop() {
+void loadMode() {
+  byte savedMode = preferences.getUChar("mode", MODE_SOUND_REACTIVE);
+  activeMode = (LampMode)(savedMode % MODE_COUNT);
+}
+
+void advanceMode() {
+  activeMode = (LampMode)(((byte)activeMode + 1) % MODE_COUNT);
+  saveMode();
+
+  if (activeMode == MODE_SOUND_REACTIVE) {
+    pressureEnvelope = noiseFloor;
+    pressureCeiling = max(noiseFloor * CEILING_HEADROOM_MULTIPLIER, noiseFloor + MIN_PRESSURE_RANGE);
+  }
+}
+
+void handleModeButton() {
+  int reading = digitalRead(MODE_BUTTON_PIN);
+  unsigned long now = millis();
+
+  if (reading != lastButtonReading) {
+    lastButtonChangeAt = now;
+    lastButtonReading = reading;
+  }
+
+  if (now - lastButtonChangeAt < BUTTON_DEBOUNCE_MS || reading == stableButtonState) {
+    return;
+  }
+
+  stableButtonState = reading;
+  if (stableButtonState == LOW) {
+    advanceMode();
+  }
+}
+
+float breathingBrightnessPercent(unsigned long now) {
+  unsigned long phase = now % BREATH_PERIOD_MS;
+  unsigned long halfPeriod = BREATH_PERIOD_MS / 2;
+  unsigned long risingOrFalling = phase < halfPeriod ? phase : BREATH_PERIOD_MS - phase;
+  float normalized = (float)risingOrFalling / (float)halfPeriod;
+  float eased = smoothstep(normalized);
+
+  return BREATH_FLOOR_PERCENT + eased * (MAX_BRIGHTNESS_PERCENT - BREATH_FLOOR_PERCENT);
+}
+
+void runSoundReactiveMode() {
   float soundPressure = readSoundPressureRms(SAMPLE_WINDOW_MS);
 
   float pressureAlpha = soundPressure > pressureEnvelope ? PRESSURE_ATTACK_ALPHA : PRESSURE_RELEASE_ALPHA;
@@ -134,4 +193,38 @@ void loop() {
 
   smoothedBrightnessPercent += (targetPercent - smoothedBrightnessPercent) * brightnessAlpha;
   writeBrightnessPercent(smoothedBrightnessPercent);
+}
+
+void setup() {
+  pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
+  analogSetPinAttenuation(MIC_PIN, ADC_11db);
+  ledcAttach(LAMP_PIN, PWM_FREQUENCY_HZ, PWM_RESOLUTION_BITS);
+  writeBrightnessPercent(0);
+
+  preferences.begin("flower", false);
+  loadMode();
+
+  micDcCenter = analogRead(MIC_PIN);
+  noiseFloor = calibrateNoiseFloor();
+  pressureEnvelope = noiseFloor;
+  pressureCeiling = max(noiseFloor * CEILING_HEADROOM_MULTIPLIER, noiseFloor + MIN_PRESSURE_RANGE);
+}
+
+void loop() {
+  handleModeButton();
+
+  switch (activeMode) {
+    case MODE_SOUND_REACTIVE:
+      runSoundReactiveMode();
+      break;
+    case MODE_SOFT_BREATH:
+      writeBrightnessPercent(breathingBrightnessPercent(millis()));
+      break;
+    case MODE_STEADY_LOW:
+      writeBrightnessPercent(STEADY_BRIGHTNESS_PERCENT);
+      break;
+    case MODE_OFF:
+      writeBrightnessPercent(0);
+      break;
+  }
 }

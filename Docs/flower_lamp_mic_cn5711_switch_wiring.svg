@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1120" viewBox="0 0 1700 1120">
+  <defs>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #172033; }
+      .title { font-size: 30px; font-weight: 700; }
+      .section { font-size: 22px; font-weight: 700; }
+      .label { font-size: 17px; font-weight: 700; }
+      .small { font-size: 15px; }
+      .tiny { font-size: 13px; }
+      .wire { fill: none; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+      .power { stroke: #dc2626; }
+      .power-switched { stroke: #f97316; }
+      .ground { stroke: #111827; }
+      .signal { stroke: #2563eb; }
+      .button { stroke: #16a34a; }
+      .mic { stroke: #0891b2; }
+      .part { fill: #ffffff; stroke: #1f2937; stroke-width: 3; }
+      .board { fill: #182033; stroke: #0f172a; stroke-width: 4; }
+      .pin { fill: #ffffff; stroke: #64748b; stroke-width: 2; }
+      .powerlabel { fill: #fff1f2; stroke: #dc2626; stroke-width: 2; }
+      .groundlabel { fill: #f8fafc; stroke: #111827; stroke-width: 2; }
+      .signallabel { fill: #eef2ff; stroke: #2563eb; stroke-width: 2; }
+      .buttonlabel { fill: #f0fdf4; stroke: #16a34a; stroke-width: 2; }
+      .miclabel { fill: #ecfeff; stroke: #0891b2; stroke-width: 2; }
+      .driverlabel { fill: #f5f3ff; stroke: #7c3aed; stroke-width: 2; }
+      .note { fill: #fff8db; stroke: #d6a500; stroke-width: 2; }
+      .legend { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .tag { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1700" height="1120" fill="#f7f9fc" />
+  <text x="60" y="56" class="title">ESP32 声控 UV 呼吸灯完整接线图：MAX9814 + CN5711 + 灯电源开关 + 模式按钮</text>
+
+  <!-- ESP32 board -->
+  <rect x="90" y="140" width="360" height="640" rx="18" class="board" />
+  <rect x="210" y="172" width="120" height="72" rx="8" fill="#313b55" stroke="#64748b" stroke-width="2" />
+  <text x="218" y="214" class="small" fill="#ffffff">ESP-WROOM-32</text>
+  <rect x="218" y="720" width="104" height="42" rx="9" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2" />
+  <text x="243" y="747" class="small">USB</text>
+  <text x="182" y="818" class="section">ESP32 Dev Board</text>
+
+  <rect x="210" y="225" width="200" height="48" rx="8" class="powerlabel" />
+  <text x="238" y="255" class="label" fill="#dc2626">5V / VIN</text>
+  <circle cx="450" cy="250" r="11" class="pin" />
+
+  <rect x="210" y="305" width="200" height="48" rx="8" class="powerlabel" />
+  <text x="258" y="335" class="label" fill="#dc2626">3V3</text>
+  <circle cx="450" cy="330" r="11" class="pin" />
+
+  <rect x="210" y="405" width="200" height="48" rx="8" class="groundlabel" />
+  <text x="258" y="435" class="label">GND</text>
+  <circle cx="450" cy="430" r="11" class="pin" />
+
+  <rect x="210" y="505" width="200" height="52" rx="8" class="miclabel" />
+  <text x="236" y="527" class="label" fill="#0891b2">GPIO34 / ADC1</text>
+  <text x="236" y="550" class="small">麦克风 OUT</text>
+  <circle cx="450" cy="530" r="11" class="pin" />
+
+  <rect x="210" y="605" width="200" height="52" rx="8" class="signallabel" />
+  <text x="250" y="627" class="label">GPIO23</text>
+  <text x="236" y="650" class="small">CN5711 CE / PWM</text>
+  <circle cx="450" cy="630" r="11" class="pin" />
+
+  <rect x="210" y="675" width="200" height="40" rx="8" class="buttonlabel" />
+  <text x="250" y="701" class="label" fill="#16a34a">GPIO27</text>
+  <circle cx="450" cy="695" r="11" class="pin" />
+
+  <!-- Lamp power switch -->
+  <rect x="565" y="220" width="160" height="60" rx="10" class="part" />
+  <text x="590" y="256" class="label">灯电源开关</text>
+  <circle cx="565" cy="250" r="10" class="pin" />
+  <circle cx="725" cy="250" r="10" class="pin" />
+  <path d="M588 262 L702 238" class="wire power" />
+
+  <!-- 4-pin momentary mode button -->
+  <rect x="520" y="675" width="100" height="56" rx="9" class="part" />
+  <text x="540" y="699" class="small">模式按钮</text>
+  <text x="546" y="719" class="tiny">4 脚复位</text>
+  <circle cx="520" cy="692" r="7" class="pin" />
+  <circle cx="520" cy="714" r="7" class="pin" />
+  <circle cx="620" cy="692" r="7" class="pin" />
+  <circle cx="620" cy="714" r="7" class="pin" />
+  <path d="M540 703 H558" class="wire button" />
+  <path d="M582 703 H600" class="wire ground" />
+  <path d="M558 703 L580 692" class="wire button" />
+
+  <!-- MAX9814 mic module -->
+  <rect x="850" y="130" width="330" height="250" rx="18" class="part" />
+  <text x="918" y="176" class="section">MAX9814 麦克风模块</text>
+  <circle cx="850" cy="205" r="10" class="pin" />
+  <rect x="868" y="185" width="88" height="40" rx="9" class="tag" />
+  <text x="886" y="211" class="small" fill="#dc2626">VCC</text>
+  <circle cx="850" cy="270" r="10" class="pin" />
+  <rect x="868" y="250" width="88" height="40" rx="9" class="tag" />
+  <text x="886" y="276" class="small">GND</text>
+  <circle cx="850" cy="335" r="10" class="pin" />
+  <rect x="868" y="315" width="88" height="40" rx="9" class="tag" />
+  <text x="886" y="341" class="small" fill="#0891b2">OUT</text>
+  <circle cx="1180" cy="205" r="10" class="pin" />
+  <rect x="1064" y="185" width="88" height="40" rx="9" class="tag" />
+  <text x="1082" y="211" class="small">GAIN</text>
+  <circle cx="1180" cy="270" r="10" class="pin" />
+  <rect x="1064" y="250" width="88" height="40" rx="9" class="tag" />
+  <text x="1082" y="276" class="small">A/R</text>
+
+  <!-- CN5711 module -->
+  <rect x="850" y="440" width="330" height="310" rx="18" class="part" />
+  <text x="950" y="486" class="section">CN5711 模块</text>
+  <rect x="916" y="515" width="196" height="72" rx="10" class="driverlabel" />
+  <text x="942" y="544" class="label">恒流驱动</text>
+  <text x="928" y="570" class="small">ISET 先调电流</text>
+
+  <circle cx="850" cy="510" r="10" class="pin" />
+  <rect x="868" y="490" width="84" height="40" rx="9" class="tag" />
+  <text x="890" y="516" class="small" fill="#f97316">VI</text>
+  <circle cx="850" cy="585" r="10" class="pin" />
+  <rect x="868" y="565" width="84" height="40" rx="9" class="tag" />
+  <text x="890" y="591" class="small">G</text>
+  <circle cx="850" cy="660" r="10" class="pin" />
+  <rect x="868" y="640" width="84" height="40" rx="9" class="tag" />
+  <text x="888" y="666" class="small" fill="#2563eb">CE</text>
+  <circle cx="1180" cy="520" r="10" class="pin" />
+  <rect x="1060" y="500" width="96" height="40" rx="9" class="tag" />
+  <text x="1074" y="526" class="small" fill="#dc2626">LED+</text>
+  <circle cx="1015" cy="750" r="10" class="pin" />
+  <text x="978" y="784" class="label">ISET</text>
+
+  <!-- UV LED -->
+  <rect x="1350" y="470" width="250" height="190" rx="14" class="part" />
+  <text x="1424" y="512" class="section">3W UV LED</text>
+  <circle cx="1350" cy="535" r="10" class="pin" />
+  <rect x="1370" y="515" width="52" height="40" rx="9" class="tag" />
+  <text x="1388" y="541" class="label" fill="#dc2626">+</text>
+  <circle cx="1350" cy="625" r="10" class="pin" />
+  <rect x="1370" y="605" width="52" height="40" rx="9" class="tag" />
+  <text x="1390" y="631" class="label">-</text>
+
+  <!-- Power and ground wiring -->
+  <path d="M450 250 H565" class="wire power" />
+  <path d="M725 250 H780 V510 H850" class="wire power-switched" />
+  <path d="M450 430 H700 V770 H1320 V625 H1350" class="wire ground" />
+  <path d="M805 770 V585 H850" class="wire ground" />
+
+  <!-- Mic wiring -->
+  <path d="M450 330 H760 V205 H850" class="wire power" />
+  <path d="M450 430 H735 V270 H850" class="wire ground" />
+  <path d="M450 530 H800 V335 H850" class="wire mic" />
+
+  <!-- Lamp control wiring -->
+  <path d="M450 630 H560" class="wire signal" />
+  <rect x="560" y="610" width="92" height="40" rx="9" class="part" />
+  <text x="580" y="636" class="small">100Ω</text>
+  <path d="M652 630 H760 V660 H850" class="wire signal" />
+  <circle cx="760" cy="660" r="7" fill="#2563eb" />
+  <path d="M760 660 V690" class="wire signal" />
+  <rect x="721" y="690" width="78" height="44" rx="9" class="part" />
+  <text x="735" y="718" class="small">100kΩ</text>
+  <path d="M760 734 V770 H805" class="wire ground" />
+
+  <!-- Mode button wiring -->
+  <path d="M450 695 H500 V692 H520" class="wire button" />
+  <path d="M620 714 H680 V770 H805" class="wire ground" />
+
+  <!-- LED wiring -->
+  <path d="M1180 520 H1280 V535 H1350" class="wire power" />
+
+  <!-- Legend and bottom explanation area -->
+  <rect x="60" y="790" width="1580" height="44" rx="10" class="legend" />
+  <line x1="84" y1="812" x2="142" y2="812" class="wire power" />
+  <text x="158" y="818" class="small">ESP32 5V</text>
+  <line x1="298" y1="812" x2="356" y2="812" class="wire power-switched" />
+  <text x="372" y="818" class="small">开关后 5V</text>
+  <line x1="562" y1="812" x2="620" y2="812" class="wire ground" />
+  <text x="636" y="818" class="small">GND</text>
+  <line x1="786" y1="812" x2="844" y2="812" class="wire signal" />
+  <text x="860" y="818" class="small">GPIO23 PWM</text>
+  <line x1="1060" y1="812" x2="1118" y2="812" class="wire button" />
+  <text x="1134" y="818" class="small">GPIO27 模式按钮</text>
+  <line x1="1350" y1="812" x2="1408" y2="812" class="wire mic" />
+  <text x="1424" y="818" class="small">MAX9814 OUT</text>
+
+  <rect x="60" y="855" width="1580" height="220" rx="12" class="note" />
+  <text x="84" y="890" class="label">接线说明</text>
+  <text x="84" y="922" class="small">ESP32 开发板 USB 提供 5V，板上 5V/VIN 引脚引出给外设；开关后 5V 只供 CN5711 的 VI。</text>
+  <text x="84" y="950" class="small">所有 GND 共地；MAX9814 用 ESP32 的 3V3 供电；MAX9814 OUT 接 GPIO34；GPIO23 通过 100Ω 接 CN5711 CE。</text>
+  <text x="84" y="978" class="small">4 脚复位按钮只用于模式切换：取按下才导通的两侧脚，一侧接 GPIO27，另一侧接 GND；代码使用内部上拉。</text>
+  <text x="84" y="1006" class="small">CN5711 先把恒流电流调到 500-600mA；UV LED 必须贴散热片，不要直视 UV 光。</text>
+  <text x="84" y="1034" class="small">GAIN 和 A/R 未画外接线：MAX9814 的 GAIN、A/R 可悬空；如果大声时削波，可把 GAIN 接 3V3 降低增益。</text>
+</svg>
