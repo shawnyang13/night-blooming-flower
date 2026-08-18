@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 ARDUINO_CLI="${ARDUINO_CLI:-$SCRIPT_DIR/tools/bin/arduino-cli}"
+CONFIG_GENERATOR="$SCRIPT_DIR/generate_config_header.sh"
 PORT="${PORT:-/dev/ttyUSB0}"
 FQBN="${FQBN:-esp32:esp32:esp32}"
 SKETCH_DIR="${SKETCH_DIR:-$ROOT_DIR/Firmware/flower_lamp_mic}"
@@ -107,6 +108,7 @@ if [[ "$DO_UPLOAD" -eq 1 && ! -w "$PORT" ]]; then
 fi
 
 if [[ "$DO_COMPILE" -eq 1 ]]; then
+  "$CONFIG_GENERATOR" "$SKETCH_DIR"
   echo "Compiling $SKETCH_DIR ..."
   "$ARDUINO_CLI" compile --fqbn "$FQBN" "$SKETCH_DIR"
 fi

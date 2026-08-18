@@ -10,6 +10,7 @@ Auto light charging night-blooming flower shines in the darkness...
 - 4 脚复位模式按钮：`GPIO27 -> 按钮 -> GND`
 - 开机静音 2 秒做底噪校准
 - 通过模式按钮切换不同灯效，其中声控律动模式会让 UV 灯亮度跟随声音强度变化
+- 重要参数在 `Firmware/flower_lamp_mic/lamp_config.conf` 中配置，运行 `bash burst/flash.sh` 或 `bash burst/flash.sh -c` 编译时会自动生成固件常量
 
 接线图：
 

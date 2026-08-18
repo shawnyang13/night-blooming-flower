@@ -203,6 +203,9 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# Arduino build-time generated config
+Firmware/*/FlowerLampConfig.generated.h
+
 # Ruff stuff:
 .ruff_cache/
 

@@ -1,4 +1,5 @@
 #include <Preferences.h>
+#include "FlowerLampConfig.h"
 
 /*
   ESP32 microphone-reactive breathing lamp controller.
@@ -23,35 +24,6 @@
     into a constant-current LED driver such as the CN5711 module.
   - Mode button: momentary push button between GPIO27 and GND.
 */
-
-const int LAMP_PIN = 23;
-const int MIC_PIN = 34;
-const int MODE_BUTTON_PIN = 27;
-
-const int PWM_FREQUENCY_HZ = 1000;
-const int PWM_RESOLUTION_BITS = 8;
-const int PWM_MAX_DUTY = (1 << PWM_RESOLUTION_BITS) - 1;
-const int MAX_BRIGHTNESS_PERCENT = 80;
-const byte BREATH_FLOOR_PERCENT = 1;
-const byte STEADY_BRIGHTNESS_PERCENT = 18;
-
-const unsigned long SAMPLE_WINDOW_MS = 25;
-const unsigned long CALIBRATION_MS = 2000;
-const unsigned int SAMPLE_DELAY_US = 120;
-
-const float DC_CENTER_ALPHA = 0.004f;
-const float PRESSURE_ATTACK_ALPHA = 0.65f;
-const float PRESSURE_RELEASE_ALPHA = 0.14f;
-const float BRIGHTNESS_ATTACK_ALPHA = 0.32f;
-const float BRIGHTNESS_RELEASE_ALPHA = 0.09f;
-const float CEILING_DECAY_ALPHA = 0.0012f;
-const float NOISE_GATE_MULTIPLIER = 0.6f;
-const float NOISE_GATE_OFFSET = 3.0f;
-const float CEILING_HEADROOM_MULTIPLIER = 5.5f;
-const float MIN_PRESSURE_RANGE = 24.0f;
-
-const unsigned long BUTTON_DEBOUNCE_MS = 35;
-const unsigned long BREATH_PERIOD_MS = 3200;
 
 enum LampMode {
   MODE_SOUND_REACTIVE = 0,
@@ -85,21 +57,23 @@ void writeBrightnessPercent(float percent) {
 
 float readSoundPressureRms(unsigned long windowMs) {
   float sumSquares = 0.0f;
-  int sampleCount = 0;
-  unsigned long windowStart = millis();
+  unsigned long sampleCount = max(1UL, ((windowMs * (unsigned long)SAMPLE_RATE_HZ) + 999UL) / 1000UL);
+  unsigned long sampleStartUs = micros();
 
-  while (millis() - windowStart < windowMs) {
+  for (unsigned long sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++) {
+    unsigned long targetSampleUs = sampleStartUs + (unsigned long)(((uint64_t)sampleIndex * 1000000ULL) / SAMPLE_RATE_HZ);
+    while ((long)(micros() - targetSampleUs) < 0) {
+      delayMicroseconds(1);
+    }
+
     int reading = analogRead(MIC_PIN);
     micDcCenter += ((float)reading - micDcCenter) * DC_CENTER_ALPHA;
 
     float acPressure = (float)reading - micDcCenter;
     sumSquares += acPressure * acPressure;
-    sampleCount++;
-
-    delayMicroseconds(SAMPLE_DELAY_US);
   }
 
-  return sampleCount > 0 ? sqrtf(sumSquares / sampleCount) : 0.0f;
+  return sqrtf(sumSquares / sampleCount);
 }
 
 float calibrateNoiseFloor() {

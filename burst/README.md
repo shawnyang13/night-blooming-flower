@@ -102,8 +102,10 @@ MAX9814 OUT 接 GPIO34 采集声音
 开机先校准 2 秒环境底噪
 声音越大，UV 灯越亮
 声音变小时，亮度缓慢回落到呼吸底亮
-最大亮度 80%
+最大亮度 98%
 ```
+
+麦克风固件的重要参数在 `Firmware/flower_lamp_mic/lamp_config.conf` 中配置。运行 `bash burst/flash.sh` 或 `bash burst/flash.sh -c` 时，脚本会先生成 `FlowerLampConfig.generated.h`，ESP32 运行时不会读取配置文件。
 
 ## 5. 常见问题
 
