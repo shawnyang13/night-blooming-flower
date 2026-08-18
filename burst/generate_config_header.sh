@@ -21,9 +21,16 @@ ALLOWED_KEY_LIST=(
   pwm_resolution_bits
   max_brightness_percent
   breath_floor_percent
+  breath_peak_percent
   steady_brightness_percent
   sample_window_ms
   calibration_ms
+  noise_floor_stddev_multiplier
+  noise_floor_margin_rms
+  noise_floor_adapt_alpha
+  noise_floor_adapt_max_rise_rms
+  sound_reactive_pre_calibration_settle_ms
+  sound_reactive_settle_ms
   sample_rate_hz
   dc_center_alpha
   pressure_attack_alpha
@@ -35,8 +42,23 @@ ALLOWED_KEY_LIST=(
   noise_gate_offset
   ceiling_headroom_multiplier
   min_pressure_range
+  loudness_activation_rms
+  loudness_first_level_rms
+  loudness_level_count
+  brightness_level_count
+  loudness_hysteresis_levels
+  brightness_level_gamma
+  transient_enabled
+  transient_baseline_alpha
+  transient_threshold_multiplier
+  transient_min_rise_rms
+  transient_pulse_percent
+  transient_pulse_decay_alpha
+  transient_cooldown_ms
   button_debounce_ms
   breath_period_ms
+  debug_serial_enabled
+  debug_serial_interval_ms
 )
 
 for key in "${ALLOWED_KEY_LIST[@]}"; do

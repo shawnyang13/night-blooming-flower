@@ -28,7 +28,7 @@ Auto light charging night-blooming flower shines in the darkness...
 
 模式说明：
 
-- 声控律动：麦克风采集到的相对声压越大，UV 灯 PWM 亮度越高；安静时缓慢回落到底亮
+- 声控律动：麦克风 RMS 经对数档位映射到 UV 亮度；检测到强拍瞬态时叠加短促高亮脉冲
 - 固定呼吸：不看麦克风，按固定节奏柔和明暗变化
 - 常亮低亮：保持低亮度常亮
 - 关灯：PWM 输出 0，UV 灯关闭
