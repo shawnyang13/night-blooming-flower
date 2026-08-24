@@ -219,3 +219,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+Docs/3D-Model
+Docs/esp32-wroom-32/开发软件/*.exe
